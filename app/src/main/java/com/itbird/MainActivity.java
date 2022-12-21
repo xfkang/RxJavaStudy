@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.itbird.myapplication.R;
+import com.itbird.rxjava.R;
 import com.itbird.rxjava.AndroidSchedulers;
 import com.itbird.rxjava.Function;
 import com.itbird.rxjava.Observable;

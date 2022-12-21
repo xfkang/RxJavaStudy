@@ -6,7 +6,7 @@ android {
     compileSdk 28
 
     defaultConfig {
-        applicationId "com.itbird.myapplication"
+        applicationId "com.itbird.rxjava"
         minSdk 23
         targetSdk 32
         versionCode 1
