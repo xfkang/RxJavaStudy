@@ -1,5 +1,7 @@
 package com.itbird;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -7,7 +9,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.itbird.rxjava.R;
@@ -16,12 +23,16 @@ import com.itbird.rxjava.Function;
 import com.itbird.rxjava.Observable;
 import com.itbird.rxjava.Observer;
 import com.itbird.rxjava.Schedulers;
+import com.itbird.rxpermissions.PermissionsUtils;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import io.reactivex.rxjava3.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
     public static String TAG = MainActivity.class.getSimpleName();
@@ -46,6 +57,49 @@ public class MainActivity extends AppCompatActivity {
          * 查看rxjava观察者模式的代码
          */
         test();
+        /**
+         * 测试获取权限
+         */
+        testPermissions();
+
+        testRxPermissions();
+    }
+
+    /**
+     * RxPermission使用代码
+     */
+    private void testRxPermissions() {
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.request(Manifest.permission.CAMERA)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Throwable {
+                        if (!aBoolean) {
+                            Log.e("Permission", "授权失败！");
+                            Toast.makeText(MainActivity.this, "授权失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void testPermissions() {
+        if (!PermissionsUtils.checkPermission(this, Manifest.permission.CAMERA)) {
+            PermissionsUtils.requestPermissions(this, Manifest.permission.CAMERA);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionsUtils.REQUEST_CODE) {
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    Log.e("Permission", "授权失败！");
+                    Toast.makeText(this, "授权失败！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
     }
 
     /**
