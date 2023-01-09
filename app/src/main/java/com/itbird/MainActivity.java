@@ -23,14 +23,21 @@ import com.itbird.rxjava.Function;
 import com.itbird.rxjava.Observable;
 import com.itbird.rxjava.Observer;
 import com.itbird.rxjava.Schedulers;
+import com.itbird.rxlogin.PlatformShare;
+import com.itbird.rxlogin.RxLogin;
+import com.itbird.rxlogin.RxLoginResult;
 import com.itbird.rxpermissions.PermissionsUtils;
 import com.tbruyelle.rxpermissions3.RxPermissions;
+import com.umeng.socialize.UMAuthListener;
+import com.umeng.socialize.UMShareAPI;
+import com.umeng.socialize.bean.SHARE_MEDIA;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import io.reactivex.rxjava3.functions.Consumer;
 
@@ -63,7 +70,67 @@ public class MainActivity extends AppCompatActivity {
         testPermissions();
 
         testRxPermissions();
+
+        testLogin();
     }
+
+    private void testLogin() {
+        UMShareAPI.get(this).getPlatformInfo(MainActivity.this, SHARE_MEDIA.QQ, authListener);
+
+
+        RxLogin.create(MainActivity.this)
+                .loginPlatform(PlatformShare.QQ)
+                .subscribe(new Consumer<RxLoginResult>() {
+                    @Override
+                    public void accept(RxLoginResult rxLoginResult) throws Throwable {
+
+                    }
+                });
+    }
+
+    UMAuthListener authListener = new UMAuthListener() {
+        /**
+         * @desc 授权开始的回调
+         * @param platform 平台名称
+         */
+        @Override
+        public void onStart(SHARE_MEDIA platform) {
+
+        }
+
+        /**
+         * @desc 授权成功的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         * @param data 用户资料返回
+         */
+        @Override
+        public void onComplete(SHARE_MEDIA platform, int action, Map<String, String> data) {
+            Toast.makeText(MainActivity.this, "成功了", Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @desc 授权失败的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         * @param t 错误原因
+         */
+        @Override
+        public void onError(SHARE_MEDIA platform, int action, Throwable t) {
+
+            Toast.makeText(MainActivity.this, "失败：" + t.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        /**
+         * @desc 授权取消的回调
+         * @param platform 平台名称
+         * @param action 行为序号，开发者用不上
+         */
+        @Override
+        public void onCancel(SHARE_MEDIA platform, int action) {
+            Toast.makeText(MainActivity.this, "取消了", Toast.LENGTH_LONG).show();
+        }
+    };
 
     /**
      * RxPermission使用代码
